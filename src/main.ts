@@ -4,6 +4,8 @@ import { ValidationPipe } from "@nestjs/common";
 import { json, urlencoded } from "express";
 import { setupSwagger } from "./lib/swagger";
 import { config } from "./config";
+import { ResponseInterceptor } from "./middleware/interceptor";
+import { HttpExceptionFilter } from "./middleware/filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,15 +33,21 @@ async function bootstrap() {
   // api path prefix
   app.setGlobalPrefix(config.apiPrefix);
 
-  // exception (에러 처리) 를 커스텀 할 수 있으나 여기서 하지 않는다.
-  // middleware 도 처리 할 수 있으나, 로그인 기반도 아닌 public 이기에 처리하지 않는다.
+  // 에러 처리도 성공 케이스와 똑같은 response 형태를 나타나게 한다.
+  // TODO :: 공통 처리가 안되는데 확인
+  app.useGlobalFilters(new HttpExceptionFilter());
+
+  // api response 형태를 공통으로 적용하기 위해 interceptor 추가
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   // swagger 셋팅 (일반 회사에서 많이 쓰는 툴이므로 설치 해본다)
   await setupSwagger(app);
+
+  // 환경 변수로 셋팅된 port 번호로 실행
   await app.listen(config.port);
 }
 
-// global await 를 사용 할 수 있으나 node 버전을 더 올려야 함으로 굳이 올리지 않고 then 으로 처리.
+// global await 를 사용 할 수 있으나 node 버전을 더 올려야 함으로 굳이 올리지 않고 then 으로 처리
 bootstrap().then(() => {
   console.log("::::::::: server start :::::::::");
   console.log(`::::::::: port: ${config.port} :::::::::`);
