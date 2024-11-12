@@ -1,5 +1,4 @@
 import { join } from "path";
-import * as fs from "node:fs";
 
 export interface ComboCard {
   pk: number;
@@ -210,21 +209,8 @@ class DB {
   ];
 
   // 이미지도 aws 에 올리는게 좋으나 아직 DB 도 없고 어드민도 없어서 static 파일을 그냥 보낸다.
-  async getImage(filename: string): Promise<File | null> {
-    try {
-      const filepath = join(__dirname, "..", "images", filename);
-
-      if (!fs.existsSync(filepath)) {
-        throw new Error(`:::::: File not found filename=${filename}::::::`);
-      }
-
-      const fileBuffer = await fs.promises.readFile(filepath);
-
-      return new File([fileBuffer], filename, { type: "image/png" });
-    } catch (e) {
-      console.error(e.message);
-      return null;
-    }
+  getImagePath(filename: string) {
+    return join(__dirname, "..", "images", filename);
   }
 }
 
