@@ -14,8 +14,8 @@ export class AssetController {
   }
 
   @Get("/download/:filename")
-  downloadController(@Param("filename") filename: string) {
-    return this.assetService.download(filename);
+  downloadController(@Param("filename") filename: string, @Res() res: Response) {
+    return this.assetService.download(filename, res);
   }
 
   // OPT :: 어드민을 만들게 되면 multer 를 이용해서 업로드 구현

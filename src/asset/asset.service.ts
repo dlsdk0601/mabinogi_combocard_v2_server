@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, StreamableFile } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { db } from "../db/db";
 import { Response } from "express";
 import * as fs from "node:fs";
@@ -16,7 +16,7 @@ export class AssetService {
     return res.sendFile(filePath);
   }
 
-  download(filename: string) {
+  download(filename: string, res: Response) {
     const filePath = db.getImagePath(filename);
 
     if (!fs.existsSync(filePath)) {
@@ -26,9 +26,9 @@ export class AssetService {
 
     const file = fs.createReadStream(filePath);
 
-    return new StreamableFile(file, {
-      type: "application/json",
-      disposition: `attachment; filename=${filename}`,
-    });
+    res.setHeader("Content-Type", "image/jpeg");
+    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+
+    file.pipe(res);
   }
 }
