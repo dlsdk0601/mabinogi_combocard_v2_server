@@ -12,7 +12,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // message 는 "" 일수도 있어서 || 으로 처리
     const message = exception.message || "Error Occurred";
 
-    console.log(response);
     const res: ApiResponse<null> = {
       data: null,
       statusCode,
