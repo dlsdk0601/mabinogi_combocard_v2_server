@@ -4,5 +4,11 @@ open: setup
 setup:
 	npm i
 
-run:
+dev-run:
 	npm run start:dev
+
+build:
+	npm run build
+
+run:
+	npm run start:prod
