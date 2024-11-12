@@ -20,7 +20,7 @@ export class AssetService {
     const filePath = db.getImagePath(filename);
 
     if (!fs.existsSync(filePath)) {
-      console.error(`:::::: File not found filename=${filename}::::::`);
+      console.error(`:::::: File not found filename=${filename} ::::::`);
       return new NotFoundException("이미지가 조회되지 않습니다.");
     }
 
