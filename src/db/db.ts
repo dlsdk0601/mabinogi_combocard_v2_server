@@ -1,4 +1,5 @@
 import { join } from "path";
+import * as process from "node:process";
 
 export interface ComboCard {
   pk: number;
@@ -210,7 +211,7 @@ class DB {
 
   // 이미지도 aws 에 올리는게 좋으나 아직 DB 도 없고 어드민도 없어서 static 파일을 그냥 보낸다.
   getImagePath(filename: string) {
-    return join(__dirname, "..", "images", filename);
+    return join(process.cwd(), "src", "db", "images", filename);
   }
 }
 
