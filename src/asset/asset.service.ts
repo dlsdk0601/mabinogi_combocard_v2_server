@@ -21,7 +21,7 @@ export class AssetService {
 
     if (!fs.existsSync(filePath)) {
       console.error(`:::::: File not found filename=${filename} ::::::`);
-      return new NotFoundException("이미지가 조회되지 않습니다.");
+      throw new NotFoundException("이미지가 조회되지 않습니다.");
     }
 
     const file = fs.createReadStream(filePath);

@@ -11,7 +11,8 @@ export class ComboCardService {
     const card = db.comboCards.find((card) => card.pk === pk);
 
     if (!card) {
-      return new NotFoundException("콤보 카드 데이터가 조회되지 않습니다.");
+      console.error(`:::::: Card not found pk=${pk}::::::`);
+      throw new NotFoundException("콤보 카드 데이터가 조회되지 않습니다.");
     }
 
     return card;
