@@ -19,7 +19,7 @@ export interface Manager {
  * */
 
 class DB {
-  readonly combocards: ComboCard[] = [
+  readonly comboCards: ComboCard[] = [
     {
       pk: 1,
       name: "다운 어택",
