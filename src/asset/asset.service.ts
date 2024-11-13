@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { db } from "../db/db";
 import { Response } from "express";
 import * as fs from "node:fs";
 import * as path from "node:path";
