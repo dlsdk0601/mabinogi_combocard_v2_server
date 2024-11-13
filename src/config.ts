@@ -5,7 +5,7 @@ import * as process from "node:process";
 class Config {
   readonly port = process.env.port ?? "8080";
   readonly version = process.env.version ?? "1.0";
-
+  readonly jwtSecretKey = process.env.JWT_SECRET_KEY ?? "";
   readonly apiPrefix = "/api";
 }
 
