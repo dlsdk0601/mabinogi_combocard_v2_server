@@ -1,12 +1,16 @@
-import { join } from "path";
-import * as process from "node:process";
-
 export interface ComboCard {
   pk: number;
   name: string;
   englishName: string;
   path: string;
   downloadPath: string;
+}
+
+export interface Manager {
+  pk: number;
+  name: string;
+  id: string;
+  password: string;
 }
 
 /*
@@ -242,10 +246,7 @@ class DB {
     },
   ];
 
-  // 이미지도 aws 에 올리는게 좋으나 아직 DB 도 없고 어드민도 없어서 static 파일을 그냥 보낸다.
-  getImagePath(filename: string) {
-    return join(process.cwd(), "src", "db", "images", filename);
-  }
+  readonly managers: Manager[] = [{ pk: 1, name: "manager", id: "manager", password: "1234" }];
 }
 
 export const db = new DB();
