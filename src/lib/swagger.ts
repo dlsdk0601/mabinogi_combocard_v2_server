@@ -6,6 +6,7 @@ export const setupSwagger = async (app: INestApplication) => {
   const options = new DocumentBuilder()
     .setTitle("mabinogi-combocard-swagger")
     .setDescription("마비노기 콤보카드 API 스웨거")
+    .addBearerAuth({ type: "http", scheme: "bearer", name: "JWT", in: "header" }, "authorization")
     .setVersion(config.version)
     .build();
 
