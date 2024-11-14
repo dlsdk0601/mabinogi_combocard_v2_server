@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { AuthResDto, SignInReqDto, SignInResDto } from "./dto/manager.dto";
 import { db } from "../db/db";
 import { JwtService } from "@nestjs/jwt";
@@ -11,7 +11,7 @@ import { API_STATUS } from "../middleware/interceptor";
 export class ManagerService {
   constructor(private jwtService: JwtService) {}
 
-  async signIn(req: SignInReqDto) {
+  async signIn(req: SignInReqDto, res: Response) {
     const manager = db.managers.find((manager) => manager.id === req.id);
 
     if (!manager) {
@@ -27,6 +27,17 @@ export class ManagerService {
 
     const payload = { sub: manager.pk, id: manager.id, name: manager.name };
     const token = await this.jwtService.signAsync(payload);
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: config.jwtSecretKey,
+      expiresIn: CONSTANT.REFRESH_TOKEN_EXPIRES_IN,
+    });
+
+    res.cookie(CONSTANT.REFRESH_TOKEN_COOKIE_KEY, refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: CONSTANT.THREE_DAY_SECONDS,
+    });
 
     return new SignInResDto(token);
   }
