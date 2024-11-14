@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ComboCardController } from './combo-card.controller';
-import { ComboCardService } from './combo-card.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { ComboCardController } from "./combo-card.controller";
+import { ComboCardService } from "./combo-card.service";
 
-describe('ComboCardController', () => {
+describe("ComboCardController", () => {
   let controller: ComboCardController;
 
   beforeEach(async () => {
@@ -14,7 +14,7 @@ describe('ComboCardController', () => {
     controller = module.get<ComboCardController>(ComboCardController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });
