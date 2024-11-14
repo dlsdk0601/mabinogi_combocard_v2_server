@@ -1,9 +1,8 @@
-import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Post, Req, Res } from "@nestjs/common";
 import { ManagerService } from "./manager.service";
 import { ApiBearerAuth, ApiCreatedResponse } from "@nestjs/swagger";
-import { SignInReqDto, SignInResDto } from "./dto/manager.dto";
-import { AuthGuard, GlobalManager } from "../lib/auth.guard";
-import { Request } from "express";
+import { AuthResDto, SignInReqDto, SignInResDto } from "./dto/manager.dto";
+import { Request, Response } from "express";
 
 @Controller("/admin/manager")
 export class ManagerController {
@@ -11,14 +10,14 @@ export class ManagerController {
 
   @Post("/sign-in")
   @ApiCreatedResponse({ type: SignInResDto })
-  signIn(@Body() req: SignInReqDto) {
-    return this.managerService.signIn(req);
+  signIn(@Body() req: SignInReqDto, @Res() res: Response) {
+    return this.managerService.signIn(req, res);
   }
 
   @Post("/auth")
-  @UseGuards(AuthGuard)
   @ApiBearerAuth("authorization")
-  auth(@Req() req: Request & { manager: GlobalManager }) {
+  @ApiCreatedResponse({ type: AuthResDto })
+  auth(@Req() req: Request) {
     const pk = req.manager.sub;
     return this.managerService.auth(pk);
   }
