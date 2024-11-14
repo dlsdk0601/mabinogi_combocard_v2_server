@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from "@nestjs/common";
 import { Response } from "express";
-import { ApiResponse } from "./interceptor";
+import { API_STATUS, ApiResponse } from "./interceptor";
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -16,8 +16,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
       data: null,
       statusCode,
       message,
+      status: this.getStatus(exception.cause),
     };
 
     response.status(statusCode).json({ ...res });
+  }
+
+  // type safe 를 위해 맵핑을 한번 한다.
+  getStatus(cause: unknown): API_STATUS {
+    switch (cause) {
+      case API_STATUS.OK:
+      case API_STATUS.BAD_REQUEST:
+      case API_STATUS.NOT_FOUND:
+      case API_STATUS.INTERNAL_ERROR:
+      case API_STATUS.TOKEN_EXPIRED:
+      case API_STATUS.REFRESH_TOKEN_EXPIRED:
+        return cause;
+      default:
+        return API_STATUS.INTERNAL_ERROR;
+    }
   }
 }
