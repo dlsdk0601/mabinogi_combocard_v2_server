@@ -52,16 +52,52 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
+    const refreshToken = this.extractRefreshTokenFromCookie(request);
 
+    // token 이 없다면 로그인 에러
     if (!token) {
-      throw new UnauthorizedException("로그인을 해주세요.");
+      throw new UnauthorizedException("로그인을 해주세요.", { cause: API_STATUS.REQUIRED_SIGN_IN });
     }
 
     try {
       const payload = await this.jwtService.verifyAsync(token, { secret: config.jwtSecretKey });
       request["manager"] = payload;
-    } catch {
-      throw new UnauthorizedException("로그인을 다시 시도해주세요.");
+    } catch (e) {
+      // 여기로 넘어왔다는건 verifyAsync 에서 에러가 났다는거
+      // 사실 토큰 만료외의 에러는 개발기에서 추측하기 애매해서 일단 재로그인을 시도한다.
+      if (e.name !== "TokenExpiredError") {
+        console.log(`:::::: TOKEN VERIFY FAIL: ${e.toString()} ::::::`);
+        throw new UnauthorizedException("로그인을 다시 시도해주세요.", {
+          cause: API_STATUS.REQUIRED_SIGN_IN,
+        });
+      }
+
+      // 토큰 만료인데, refreshToken 도 없다 => 재로그인
+      if (!refreshToken) {
+        throw new UnauthorizedException("로그인을 다시 시도해주세요.", {
+          cause: API_STATUS.REQUIRED_SIGN_IN,
+        });
+      }
+
+      // 토큰 만료인데, refreshToken 은 있다 => 검증
+      try {
+        const refreshPayload = await this.jwtService.verifyAsync(refreshToken, {
+          secret: config.jwtSecretKey,
+        });
+
+        if (refreshPayload) {
+          // 검증 성공 => client 단에서 토큰 재발급을 요청하라고 에러를 던져준다.
+          throw new UnauthorizedException("로그인을 다시 시도해주세요.", {
+            cause: API_STATUS.TOKEN_EXPIRED,
+          });
+        }
+      } catch (refreshTokenErr) {
+        // refresh-token 검증 실패 => 로그인 재시도
+        console.error(`:::::: REFRESH TOKEN VERIFY FAIL: ${refreshTokenErr.toString()} :::::::`);
+        throw new UnauthorizedException("로그인을 다시 시도해주세요.", {
+          cause: API_STATUS.REQUIRED_SIGN_IN,
+        });
+      }
     }
 
     return true;
@@ -70,5 +106,9 @@ export class AuthGuard implements CanActivate {
   private extractTokenFromHeader(request: Request): string | null {
     const [type, token] = request.headers.authorization?.split(" ") ?? [];
     return type === this.HEADER_TYPE ? token : null;
+  }
+
+  private extractRefreshTokenFromCookie(request: Request): string | null {
+    return request.cookies[CONSTANT.REFRESH_TOKEN_COOKIE_KEY] ?? null;
   }
 }
