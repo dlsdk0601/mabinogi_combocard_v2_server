@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { Response } from "express";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { API_STATUS } from "../middleware/interceptor";
 
 @Injectable()
 export class AssetService {
@@ -10,7 +11,7 @@ export class AssetService {
 
     if (!fs.existsSync(filePath)) {
       console.error(`:::::: File not found filename=${filename}::::::`);
-      throw new NotFoundException("이미지가 조회되지 않습니다.");
+      throw new NotFoundException("이미지가 조회되지 않습니다.", { cause: API_STATUS.NOT_FOUND });
     }
 
     return res.sendFile(filePath);
@@ -21,7 +22,7 @@ export class AssetService {
 
     if (!fs.existsSync(filePath)) {
       console.error(`:::::: File not found filename=${filename} ::::::`);
-      throw new NotFoundException("이미지가 조회되지 않습니다.");
+      throw new NotFoundException("이미지가 조회되지 않습니다.", { cause: API_STATUS.NOT_FOUND });
     }
 
     const file = fs.createReadStream(filePath);
