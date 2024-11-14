@@ -2,6 +2,7 @@ import { Controller, Get, Param, Res } from "@nestjs/common";
 import { AssetService } from "./asset.service";
 import { Response } from "express";
 import { ApiTags } from "@nestjs/swagger";
+import { Public } from "../middleware/auth.guard";
 
 @Controller("/asset")
 @ApiTags("이미지")
@@ -9,11 +10,13 @@ export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
   @Get("/:filename")
+  @Public()
   findOne(@Param("filename") filename: string, @Res() res: Response) {
     return this.assetService.findOne(filename, res);
   }
 
   @Get("/download/:filename")
+  @Public()
   downloadController(@Param("filename") filename: string, @Res() res: Response) {
     return this.assetService.download(filename, res);
   }
