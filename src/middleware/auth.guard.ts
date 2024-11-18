@@ -60,7 +60,9 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, { secret: config.jwtSecretKey });
+      const payload = await this.jwtService.verifyAsync<GlobalManager>(token, {
+        secret: config.jwtSecretKey,
+      });
       request["manager"] = payload;
     } catch (e) {
       // 여기로 넘어왔다는건 verifyAsync 에서 에러가 났다는거
@@ -81,7 +83,7 @@ export class AuthGuard implements CanActivate {
 
       // 토큰 만료인데, refreshToken 은 있다 => 검증
       try {
-        const refreshPayload = await this.jwtService.verifyAsync(refreshToken, {
+        const refreshPayload = await this.jwtService.verifyAsync<GlobalManager>(refreshToken, {
           secret: config.jwtSecretKey,
         });
 
