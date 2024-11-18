@@ -48,3 +48,16 @@ export class AuthResDto {
     this.name = name;
   }
 }
+
+export class TokenRefreshReqDto {}
+
+export class TokenRefreshResDto {
+  @ApiProperty({ description: "JWT", nullable: false, type: "string" })
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+
+  constructor(token: string) {
+    this.token = token;
+  }
+}
